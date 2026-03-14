@@ -1,125 +1,191 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Feliz Cumpleaños</title>
+<title>Birthday Surprise</title>
 
 <style>
+
 body{
-    margin:0;
-    height:100vh;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    background:linear-gradient(135deg,#ff9a9e,#fad0c4);
-    font-family:Arial, Helvetica, sans-serif;
-    overflow:hidden;
+background:black;
+color:#00ff9c;
+font-family:monospace;
+display:flex;
+justify-content:center;
+align-items:center;
+flex-direction:column;
+height:100vh;
+overflow:hidden;
 }
 
-.container{
-    text-align:center;
-    color:white;
+/* terminal */
+
+#terminal{
+width:600px;
+height:200px;
+background:#020617;
+border-radius:10px;
+padding:20px;
+box-shadow:0 20px 40px rgba(0,0,0,0.6);
 }
 
-h1{
-    font-size:70px;
-    animation:brillo 2s infinite alternate;
+/* button */
+
+#startBtn{
+margin-top:30px;
+padding:15px 30px;
+font-size:20px;
+background:#ff4081;
+border:none;
+border-radius:10px;
+color:white;
+cursor:pointer;
+display:none;
 }
 
-p{
-    font-size:25px;
-}
+/* balloons */
 
-@keyframes brillo{
-    from{ text-shadow:0 0 10px white;}
-    to{ text-shadow:0 0 30px yellow;}
+#balloons{
+display:none;
+margin-top:30px;
 }
-
-/* Globos */
 
 .balloon{
-    position:absolute;
-    bottom:-150px;
-    width:80px;
-    height:100px;
-    border-radius:50%;
-    animation:subir 10s infinite;
+width:80px;
+height:100px;
+background:red;
+border-radius:50%;
+display:inline-block;
+margin:10px;
+cursor:pointer;
+position:relative;
 }
 
 .balloon:after{
-    content:"";
-    position:absolute;
-    width:2px;
-    height:60px;
-    background:white;
-    left:50%;
-    top:100%;
+content:"";
+width:2px;
+height:50px;
+background:white;
+position:absolute;
+left:50%;
+top:100%;
 }
 
-@keyframes subir{
-    0%{ transform:translateY(0);}
-    100%{ transform:translateY(-120vh);}
+/* letter */
+
+#letter{
+display:none;
+background:white;
+color:black;
+padding:30px;
+width:400px;
+border-radius:10px;
+text-align:center;
+box-shadow:0 10px 30px rgba(0,0,0,0.5);
 }
 
-/* colores globos */
+/* cake */
 
-.b1{background:red; left:10%; animation-duration:9s;}
-.b2{background:blue; left:25%; animation-duration:11s;}
-.b3{background:yellow; left:40%; animation-duration:10s;}
-.b4{background:purple; left:60%; animation-duration:12s;}
-.b5{background:orange; left:75%; animation-duration:8s;}
-.b6{background:lime; left:90%; animation-duration:13s;}
-
-/* pastel */
-
-.cake{
-    font-size:80px;
-    margin-top:20px;
+#cake{
+display:none;
+font-size:120px;
+margin-top:30px;
+cursor:pointer;
 }
 
-/* confeti */
-
-.confetti{
-    position:absolute;
-    width:10px;
-    height:10px;
-    background:white;
-    animation:confeti 5s linear infinite;
-}
-
-@keyframes confeti{
-    0%{ transform:translateY(-10vh) rotate(0deg);}
-    100%{ transform:translateY(110vh) rotate(360deg);}
-}
 </style>
 </head>
 
 <body>
 
-<div class="container">
-    <h1>🎉 Feliz Cumpleaños 🎉</h1>
-    <p>Que este día esté lleno de alegría, amor y muchos sueños cumplidos.</p>
-    <div class="cake">🎂</div>
+<div id="terminal"></div>
+
+<button id="startBtn">Click on me</button>
+
+<div id="balloons">
+<div class="balloon" onclick="pop(this)"></div>
+<div class="balloon" onclick="pop(this)"></div>
+<div class="balloon" onclick="pop(this)"></div>
+<div class="balloon" onclick="pop(this)"></div>
+<div class="balloon" onclick="pop(this)"></div>
 </div>
 
-<!-- Globos -->
-<div class="balloon b1"></div>
-<div class="balloon b2"></div>
-<div class="balloon b3"></div>
-<div class="balloon b4"></div>
-<div class="balloon b5"></div>
-<div class="balloon b6"></div>
+<div id="letter">
+<h2>Happy Birthday 💌</h2>
 
-<!-- Confeti -->
+<p>I hope today brings you happiness, laughter, and beautiful moments.</p>
+
+<p>You deserve all the joy in the world and many dreams coming true.</p>
+
+<p>May this year be full of amazing adventures and unforgettable memories.</p>
+
+<p>Never stop shining and being the wonderful person you are.</p>
+
+<p>🎉 Happy Birthday 🎉</p>
+
+<button onclick="showCake()">Continue</button>
+</div>
+
+<div id="cake">🎂</div>
+
 <script>
-for(let i=0;i<80;i++){
-    let confeti=document.createElement("div");
-    confeti.className="confetti";
-    confeti.style.left=Math.random()*100+"%";
-    confeti.style.animationDuration=(Math.random()*3+3)+"s";
-    confeti.style.backgroundColor="hsl("+Math.random()*360+",100%,50%)";
-    document.body.appendChild(confeti);
+
+/* hacker typing */
+
+const text = `Initializing birthday protocol...
+Loading happiness...
+Preparing balloons...
+Deploying surprise...`;
+
+let i = 0;
+const terminal = document.getElementById("terminal");
+
+function type(){
+if(i < text.length){
+terminal.innerHTML += text.charAt(i);
+i++;
+setTimeout(type,40);
 }
+else{
+document.getElementById("startBtn").style.display="block";
+}
+}
+
+type();
+
+/* button */
+
+document.getElementById("startBtn").onclick = function(){
+document.getElementById("balloons").style.display="block";
+}
+
+/* balloons */
+
+let popped = 0;
+
+function pop(balloon){
+
+balloon.style.background="transparent";
+balloon.style.border="none";
+balloon.innerHTML="💥";
+
+popped++;
+
+if(popped===5){
+setTimeout(()=>{
+document.getElementById("letter").style.display="block";
+},500);
+}
+
+}
+
+/* cake */
+
+function showCake(){
+document.getElementById("letter").style.display="none";
+document.getElementById("cake").style.display="block";
+}
+
 </script>
 
 </body>
