@@ -7,25 +7,27 @@
 <style>
 
 body{
+margin:0;
+font-family:monospace;
 background:black;
 color:#00ff9c;
-font-family:monospace;
 display:flex;
-justify-content:center;
-align-items:center;
 flex-direction:column;
+align-items:center;
+justify-content:center;
 height:100vh;
 overflow:hidden;
+transition:1s;
 }
 
 /* terminal */
 
 #terminal{
 width:600px;
-height:200px;
+height:220px;
 background:#020617;
-border-radius:10px;
 padding:20px;
+border-radius:10px;
 box-shadow:0 20px 40px rgba(0,0,0,0.6);
 }
 
@@ -33,11 +35,11 @@ box-shadow:0 20px 40px rgba(0,0,0,0.6);
 
 #startBtn{
 margin-top:30px;
-padding:15px 30px;
-font-size:20px;
-background:#ff4081;
+padding:15px 35px;
+font-size:22px;
 border:none;
-border-radius:10px;
+border-radius:12px;
+background:#ff4fa3;
 color:white;
 cursor:pointer;
 display:none;
@@ -47,50 +49,85 @@ display:none;
 
 #balloons{
 display:none;
-margin-top:30px;
+margin-top:40px;
 }
 
 .balloon{
-width:80px;
-height:100px;
-background:red;
+width:90px;
+height:110px;
 border-radius:50%;
-display:inline-block;
-margin:10px;
+display:inline-flex;
+align-items:center;
+justify-content:center;
+color:white;
+font-size:14px;
+text-align:center;
+padding:10px;
+margin:15px;
 cursor:pointer;
-position:relative;
+box-shadow:0 10px 20px rgba(0,0,0,0.3);
 }
 
-.balloon:after{
-content:"";
-width:2px;
-height:50px;
-background:white;
-position:absolute;
-left:50%;
-top:100%;
-}
+.b1{background:#ff6b6b;}
+.b2{background:#ffb86b;}
+.b3{background:#ffd93d;}
+.b4{background:#6bc5ff;}
+.b5{background:#b36bff;}
 
 /* letter */
 
 #letter{
 display:none;
-background:white;
-color:black;
+background:#fff8fb;
 padding:30px;
-width:400px;
-border-radius:10px;
+border-radius:15px;
+width:420px;
 text-align:center;
-box-shadow:0 10px 30px rgba(0,0,0,0.5);
+color:#444;
+font-family:Arial;
+box-shadow:0 15px 35px rgba(0,0,0,0.3);
 }
 
 /* cake */
 
-#cake{
+#cakeArea{
 display:none;
-font-size:120px;
+flex-direction:column;
+align-items:center;
 margin-top:30px;
+}
+
+#cake{
+font-size:120px;
+}
+
+.candle{
+font-size:30px;
 cursor:pointer;
+margin:5px;
+}
+
+#final{
+display:none;
+font-family:Arial;
+font-size:60px;
+color:#ff6fb5;
+text-shadow:0 0 20px #fff;
+margin-top:30px;
+}
+
+/* confetti */
+
+.confetti{
+position:absolute;
+width:10px;
+height:10px;
+animation:fall 4s linear infinite;
+}
+
+@keyframes fall{
+0%{transform:translateY(-10vh) rotate(0deg)}
+100%{transform:translateY(110vh) rotate(360deg)}
 }
 
 </style>
@@ -103,39 +140,54 @@ cursor:pointer;
 <button id="startBtn">Click on me</button>
 
 <div id="balloons">
-<div class="balloon" onclick="pop(this)"></div>
-<div class="balloon" onclick="pop(this)"></div>
-<div class="balloon" onclick="pop(this)"></div>
-<div class="balloon" onclick="pop(this)"></div>
-<div class="balloon" onclick="pop(this)"></div>
+<div class="balloon b1" onclick="showMessage(this,'You are amazing 💖')"></div>
+<div class="balloon b2" onclick="showMessage(this,'Never stop smiling 😊')"></div>
+<div class="balloon b3" onclick="showMessage(this,'Dream big ✨')"></div>
+<div class="balloon b4" onclick="showMessage(this,'You deserve happiness 🌸')"></div>
+<div class="balloon b5" onclick="showMessage(this,'Have a magical birthday 🎉')"></div>
 </div>
 
 <div id="letter">
-<h2>Happy Birthday 💌</h2>
+<h2>💌 A Birthday Message</h2>
 
-<p>I hope today brings you happiness, laughter, and beautiful moments.</p>
+<p>Today is a beautiful day because someone very special was born.</p>
 
-<p>You deserve all the joy in the world and many dreams coming true.</p>
+<p>May your life be filled with joy, love, and amazing adventures.</p>
 
-<p>May this year be full of amazing adventures and unforgettable memories.</p>
+<p>You deserve laughter, dreams, and endless happiness.</p>
 
-<p>Never stop shining and being the wonderful person you are.</p>
+<p>Never forget how wonderful you are.</p>
 
-<p>🎉 Happy Birthday 🎉</p>
-
-<button onclick="showCake()">Continue</button>
+<button onclick="showCake()">Continue 🎂</button>
 </div>
 
+<div id="cakeArea">
+
 <div id="cake">🎂</div>
+
+<div>
+<span class="candle" onclick="blow(this)">🕯</span>
+<span class="candle" onclick="blow(this)">🕯</span>
+<span class="candle" onclick="blow(this)">🕯</span>
+<span class="candle" onclick="blow(this)">🕯</span>
+<span class="candle" onclick="blow(this)">🕯</span>
+</div>
+
+</div>
+
+<div id="final">
+🎉 Happy Birthday 🎉
+</div>
 
 <script>
 
 /* hacker typing */
 
-const text = `Initializing birthday protocol...
+const text = `Initializing birthday surprise...
 Loading happiness...
 Preparing balloons...
-Deploying surprise...`;
+Generating sweet messages...
+Deploying cake...`;
 
 let i = 0;
 const terminal = document.getElementById("terminal");
@@ -153,28 +205,27 @@ document.getElementById("startBtn").style.display="block";
 
 type();
 
-/* button */
+/* start button */
 
-document.getElementById("startBtn").onclick = function(){
+document.getElementById("startBtn").onclick = ()=>{
+document.body.style.background="linear-gradient(135deg,#ffd6ec,#ffe8cc,#e0f7ff)";
 document.getElementById("balloons").style.display="block";
 }
 
 /* balloons */
 
-let popped = 0;
+let clicked = 0;
 
-function pop(balloon){
+function showMessage(balloon,message){
 
-balloon.style.background="transparent";
-balloon.style.border="none";
-balloon.innerHTML="💥";
+balloon.innerHTML=message;
+clicked++;
 
-popped++;
-
-if(popped===5){
+if(clicked===5){
 setTimeout(()=>{
+document.getElementById("balloons").style.display="none";
 document.getElementById("letter").style.display="block";
-},500);
+},1200);
 }
 
 }
@@ -183,7 +234,40 @@ document.getElementById("letter").style.display="block";
 
 function showCake(){
 document.getElementById("letter").style.display="none";
-document.getElementById("cake").style.display="block";
+document.getElementById("cakeArea").style.display="flex";
+}
+
+let candles=5;
+
+function blow(c){
+c.innerHTML="💨";
+candles--;
+
+if(candles===0){
+showFinal();
+}
+}
+
+/* final screen */
+
+function showFinal(){
+
+document.getElementById("cakeArea").style.display="none";
+document.getElementById("final").style.display="block";
+
+for(let i=0;i<120;i++){
+
+let conf=document.createElement("div");
+
+conf.className="confetti";
+conf.style.left=Math.random()*100+"%";
+conf.style.background="hsl("+Math.random()*360+",100%,70%)";
+conf.style.animationDuration=(Math.random()*3+2)+"s";
+
+document.body.appendChild(conf);
+
+}
+
 }
 
 </script>
