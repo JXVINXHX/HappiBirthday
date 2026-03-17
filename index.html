@@ -1,280 +1,618 @@
-
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Elegant Wrapped Bouquet</title>
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ramo de Rosas</title>
 <style>
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;1,300;1,400&display=swap');
 
-body{
-margin:0;
-height:100vh;
-display:flex;
-justify-content:center;
-align-items:flex-end;
-background:linear-gradient(#fff,#ffeaf4);
-overflow:hidden;
-}
+  :root {
+    --rose-deep: #8B1A2F;
+    --rose-mid: #C0395A;
+    --rose-light: #E8698A;
+    --rose-petal: #F4A7B9;
+    --rose-blush: #FDD5DE;
+    --peony-pink: #E8A0B4;
+    --lavender: #C9A8D4;
+    --cream: #FFF5E6;
+    --leaf-deep: #1A4A2E;
+    --leaf-mid: #2D6A4F;
+    --leaf-light: #52B788;
+    --ribbon-gold: #D4AF37;
+    --ribbon-dark: #A8891F;
+    --stem-brown: #5C3A1E;
+    --bg-start: #1a0a0f;
+    --bg-end: #0d1a0f;
+  }
 
-/* CONTENEDOR */
+  * { margin: 0; padding: 0; box-sizing: border-box; }
 
-#bouquet{
-position:relative;
-width:420px;
-height:650px;
-animation:rise 3s ease forwards;
-transform:translateY(700px);
-}
+  body {
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    background: radial-gradient(ellipse at 50% 100%, #2d1220 0%, #1a0a0f 40%, #0a0d0e 100%);
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    font-family: 'Cormorant Garamond', serif;
+  }
 
-@keyframes rise{
-to{transform:translateY(0);}
-}
+  /* Ambient particles */
+  .particles { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
+  .particle {
+    position: absolute;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,200,180,0.6), transparent);
+    animation: float-particle linear infinite;
+    opacity: 0;
+  }
 
-/* TALLOS */
+  @keyframes float-particle {
+    0% { transform: translateY(100vh) scale(0); opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 0.4; }
+    100% { transform: translateY(-10vh) scale(1); opacity: 0; }
+  }
 
-.stem{
-position:absolute;
-width:6px;
-background:#2e8b57;
-bottom:140px;
-border-radius:4px;
-transform-origin:bottom;
-}
+  /* Glow on floor */
+  .floor-glow {
+    position: fixed;
+    bottom: -60px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 500px;
+    height: 160px;
+    background: radial-gradient(ellipse, rgba(180,60,80,0.25) 0%, transparent 70%);
+    border-radius: 50%;
+    z-index: 0;
+    animation: glow-pulse 4s ease-in-out infinite;
+  }
+  @keyframes glow-pulse {
+    0%,100% { opacity: 0.6; transform: translateX(-50%) scaleX(1); }
+    50% { opacity: 1; transform: translateX(-50%) scaleX(1.1); }
+  }
 
-/* HOJAS */
+  /* Main bouquet container */
+  .bouquet-wrapper {
+    position: relative;
+    width: 420px;
+    height: 600px;
+    z-index: 10;
+    animation: bouquet-rise 2.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  @keyframes bouquet-rise {
+    0% { transform: translateY(100%); opacity: 0; }
+    30% { opacity: 1; }
+    100% { transform: translateY(0); opacity: 1; }
+  }
 
-.leaf{
-position:absolute;
-width:40px;
-height:20px;
-background:#3cb371;
-border-radius:50%;
-transform-origin:left;
-}
+  /* SVG container */
+  .bouquet-svg {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    filter: drop-shadow(0 30px 60px rgba(100,20,40,0.5));
+  }
 
-/* FLORES */
+  /* Petal animations */
+  @keyframes sway {
+    0%,100% { transform-origin: bottom center; transform: rotate(-1.5deg); }
+    50% { transform-origin: bottom center; transform: rotate(1.5deg); }
+  }
+  @keyframes sway-alt {
+    0%,100% { transform-origin: bottom center; transform: rotate(1deg); }
+    50% { transform-origin: bottom center; transform: rotate(-2deg); }
+  }
+  @keyframes breathe {
+    0%,100% { transform: scale(1); }
+    50% { transform: scale(1.015); }
+  }
+  @keyframes petal-bloom {
+    0% { transform: scale(0.3) rotate(-20deg); opacity: 0; }
+    60% { transform: scale(1.05) rotate(3deg); opacity: 1; }
+    100% { transform: scale(1) rotate(0deg); opacity: 1; }
+  }
+  @keyframes ribbon-wave {
+    0%,100% { transform: skewX(-1deg); }
+    50% { transform: skewX(1deg); }
+  }
+  @keyframes leaf-unfurl {
+    0% { transform: scaleY(0) rotate(10deg); opacity: 0; transform-origin: bottom center; }
+    100% { transform: scaleY(1) rotate(0deg); opacity: 1; transform-origin: bottom center; }
+  }
 
-.flower{
-position:absolute;
-transform-origin:bottom center;
-animation:sway 5s ease-in-out infinite;
-}
+  .rose-group { animation: sway 5s ease-in-out infinite; }
+  .rose-group:nth-child(odd) { animation: sway-alt 6s ease-in-out infinite; }
+  .rose-group:nth-child(3n) { animation: sway 7s ease-in-out infinite; animation-delay: -2s; }
 
-@keyframes sway{
-0%{transform:rotate(-2deg)}
-50%{transform:rotate(2deg)}
-100%{transform:rotate(-2deg)}
-}
+  .bloom-delay-1 { animation-delay: 0.3s; }
+  .bloom-delay-2 { animation-delay: 0.6s; }
+  .bloom-delay-3 { animation-delay: 0.9s; }
+  .bloom-delay-4 { animation-delay: 1.2s; }
+  .bloom-delay-5 { animation-delay: 1.5s; }
 
-/* ROSA */
+  /* Floating petals */
+  @keyframes fall-petal {
+    0% { transform: translate(0,0) rotate(0deg); opacity: 0.8; }
+    100% { transform: translate(var(--dx), 120px) rotate(var(--rot)); opacity: 0; }
+  }
+  .falling-petal {
+    position: fixed;
+    pointer-events: none;
+    z-index: 20;
+    animation: fall-petal var(--dur) ease-in forwards;
+    animation-delay: var(--delay);
+    opacity: 0;
+  }
 
-.rose{
-width:70px;
-height:70px;
-}
-
-.rose .petal{
-position:absolute;
-width:32px;
-height:42px;
-background:#e63946;
-border-radius:50%;
-}
-
-/* GIRASOL */
-
-.sunflower{
-width:70px;
-height:70px;
-}
-
-.sunflower .petal{
-position:absolute;
-width:18px;
-height:40px;
-background:#f4a261;
-border-radius:20px;
-transform-origin:bottom center;
-}
-
-.sunflower .center{
-position:absolute;
-width:26px;
-height:26px;
-background:#6b3e26;
-border-radius:50%;
-top:20px;
-left:22px;
-}
-
-/* CLAVEL */
-
-.carnation .petal{
-position:absolute;
-width:30px;
-height:30px;
-background:#ff7aa2;
-border-radius:50%;
-}
-
-/* POSICIÓN FLORES */
-
-.f1{left:120px;bottom:380px;}
-.f2{left:200px;bottom:410px;}
-.f3{left:70px;bottom:360px;}
-.f4{left:260px;bottom:350px;}
-.f5{left:170px;bottom:450px;}
-
-/* ENVOLTURA DEL RAMO */
-
-.wrap{
-position:absolute;
-bottom:0;
-left:60px;
-width:300px;
-height:260px;
-background:linear-gradient(135deg,#f6d6c6,#fff);
-clip-path:polygon(0 0,100% 0,75% 100%,25% 100%);
-box-shadow:0 10px 30px rgba(0,0,0,0.2);
-}
-
-/* LISTON */
-
-.ribbon{
-position:absolute;
-bottom:120px;
-left:160px;
-width:120px;
-height:60px;
-}
-
-.knot{
-width:40px;
-height:30px;
-background:#ffd43b;
-border-radius:6px;
-position:absolute;
-left:40px;
-z-index:5;
-}
-
-.loopL,.loopR{
-width:50px;
-height:20px;
-background:#ffd43b;
-position:absolute;
-top:5px;
-border-radius:20px;
-}
-
-.loopL{
-left:-5px;
-transform:rotate(-25deg);
-}
-
-.loopR{
-right:-5px;
-transform:rotate(25deg);
-}
-
-.tailL,.tailR{
-width:20px;
-height:60px;
-background:#ffd43b;
-position:absolute;
-top:25px;
-}
-
-.tailL{left:20px;transform:rotate(8deg);}
-.tailR{right:20px;transform:rotate(-8deg);}
-
+  /* Label */
+  .label {
+    position: fixed;
+    top: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: rgba(255,220,210,0.7);
+    font-size: 1.1rem;
+    font-style: italic;
+    font-weight: 300;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    opacity: 0;
+    animation: fade-in 1.5s ease forwards 2.5s;
+  }
+  @keyframes fade-in {
+    to { opacity: 1; }
+  }
 </style>
 </head>
-
 <body>
 
-<div id="bouquet">
+<div class="particles" id="particles"></div>
+<div class="floor-glow"></div>
 
-<!-- FLORES -->
+<p class="label">Con todo el amor</p>
 
-<div class="flower rose f1">
-<div class="petal" style="top:10px;left:20px"></div>
-<div class="petal" style="top:0px;left:10px"></div>
-<div class="petal" style="top:0px;left:30px"></div>
-<div class="petal" style="top:15px;left:5px"></div>
-<div class="petal" style="top:15px;left:35px"></div>
+<div class="bouquet-wrapper">
+<svg class="bouquet-svg" viewBox="0 0 420 600" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Rose gradients -->
+    <radialGradient id="rg1" cx="45%" cy="40%" r="55%">
+      <stop offset="0%" stop-color="#F4A7B9"/>
+      <stop offset="45%" stop-color="#C0395A"/>
+      <stop offset="100%" stop-color="#7A1228"/>
+    </radialGradient>
+    <radialGradient id="rg2" cx="50%" cy="35%" r="55%">
+      <stop offset="0%" stop-color="#FFB8C8"/>
+      <stop offset="40%" stop-color="#D4526E"/>
+      <stop offset="100%" stop-color="#8B1A2F"/>
+    </radialGradient>
+    <radialGradient id="rg3" cx="40%" cy="38%" r="58%">
+      <stop offset="0%" stop-color="#FDD5DE"/>
+      <stop offset="50%" stop-color="#E8698A"/>
+      <stop offset="100%" stop-color="#9E2345"/>
+    </radialGradient>
+    <radialGradient id="rg4" cx="48%" cy="42%" r="52%">
+      <stop offset="0%" stop-color="#E8A0B4"/>
+      <stop offset="45%" stop-color="#B54A6A"/>
+      <stop offset="100%" stop-color="#7A1A32"/>
+    </radialGradient>
+    <!-- Peony -->
+    <radialGradient id="pg1" cx="50%" cy="40%" r="55%">
+      <stop offset="0%" stop-color="#FDE8F0"/>
+      <stop offset="50%" stop-color="#E8A0B4"/>
+      <stop offset="100%" stop-color="#C06080"/>
+    </radialGradient>
+    <!-- Lavender flower -->
+    <radialGradient id="lg1" cx="50%" cy="40%" r="55%">
+      <stop offset="0%" stop-color="#E8D8F4"/>
+      <stop offset="50%" stop-color="#C9A8D4"/>
+      <stop offset="100%" stop-color="#8A6A9E"/>
+    </radialGradient>
+    <!-- Leaf gradient -->
+    <linearGradient id="leafG" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#52B788"/>
+      <stop offset="100%" stop-color="#1A4A2E"/>
+    </linearGradient>
+    <linearGradient id="leafG2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#40916C"/>
+      <stop offset="100%" stop-color="#1B4332"/>
+    </linearGradient>
+    <!-- Ribbon gradient -->
+    <linearGradient id="ribbonG" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F0D060"/>
+      <stop offset="30%" stop-color="#D4AF37"/>
+      <stop offset="60%" stop-color="#F0D060"/>
+      <stop offset="100%" stop-color="#A8891F"/>
+    </linearGradient>
+    <linearGradient id="ribbonGV" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#F0D060"/>
+      <stop offset="50%" stop-color="#C8A020"/>
+      <stop offset="100%" stop-color="#E8C840"/>
+    </linearGradient>
+    <!-- Stem gradient -->
+    <linearGradient id="stemG" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#2D6A4F"/>
+      <stop offset="50%" stop-color="#40916C"/>
+      <stop offset="100%" stop-color="#1B4332"/>
+    </linearGradient>
+    <!-- Wrap paper -->
+    <linearGradient id="wrapG" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFF8F0" stop-opacity="0.95"/>
+      <stop offset="100%" stop-color="#F5E8D8" stop-opacity="0.85"/>
+    </linearGradient>
+    <!-- Glow filter -->
+    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="soft-shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="2" dy="4" stdDeviation="6" flood-color="rgba(80,20,30,0.4)"/>
+    </filter>
+    <filter id="petal-glow">
+      <feGaussianBlur stdDeviation="2.5" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- ===== STEMS ===== -->
+  <!-- Central stems cluster -->
+  <g opacity="0.9">
+    <!-- Stem 1 (center-left) -->
+    <path d="M195,600 C193,550 188,500 192,450 C196,400 200,360 205,310" stroke="url(#stemG)" stroke-width="5" fill="none" stroke-linecap="round"/>
+    <!-- Stem 2 (center) -->
+    <path d="M210,600 C210,545 210,490 210,435 C210,380 208,340 210,290" stroke="url(#stemG)" stroke-width="6" fill="none" stroke-linecap="round"/>
+    <!-- Stem 3 (center-right) -->
+    <path d="M225,600 C227,548 232,498 228,448 C224,398 220,355 218,300" stroke="url(#stemG)" stroke-width="5" fill="none" stroke-linecap="round"/>
+    <!-- Stem 4 (left) -->
+    <path d="M185,600 C180,548 170,490 165,440 C160,390 158,350 155,295" stroke="url(#stemG)" stroke-width="4" fill="none" stroke-linecap="round"/>
+    <!-- Stem 5 (right) -->
+    <path d="M235,600 C242,548 252,492 258,442 C264,392 268,352 270,295" stroke="url(#stemG)" stroke-width="4" fill="none" stroke-linecap="round"/>
+    <!-- Stem 6 (far left) -->
+    <path d="M175,600 C165,548 148,492 138,442 C128,390 120,345 110,285" stroke="url(#stemG)" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+    <!-- Stem 7 (far right) -->
+    <path d="M245,600 C258,548 278,492 292,442 C306,390 315,345 325,285" stroke="url(#stemG)" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+  </g>
+
+  <!-- ===== LEAVES ===== -->
+  <!-- Leaf pairs along stems -->
+  <!-- Left leaves -->
+  <g filter="url(#soft-shadow)" style="animation: leaf-unfurl 1.2s ease forwards 1.8s; opacity:0">
+    <path d="M165,440 C145,415 125,400 110,415 C125,430 145,440 165,440Z" fill="url(#leafG)" opacity="0.9"/>
+    <path d="M165,440 C155,425 148,410 155,400" stroke="#1A4A2E" stroke-width="1" fill="none"/>
+  </g>
+  <g style="animation: leaf-unfurl 1.2s ease forwards 2s; opacity:0">
+    <path d="M155,370 C130,355 112,338 118,318 C135,332 148,350 155,370Z" fill="url(#leafG2)" opacity="0.85"/>
+    <path d="M155,370 C142,352 135,335 140,320" stroke="#1A4A2E" stroke-width="1" fill="none"/>
+  </g>
+  <!-- Right leaves -->
+  <g style="animation: leaf-unfurl 1.2s ease forwards 1.9s; opacity:0">
+    <path d="M258,442 C280,418 300,404 316,420 C300,435 278,444 258,442Z" fill="url(#leafG)" opacity="0.9"/>
+    <path d="M258,442 C270,427 278,412 270,402" stroke="#1A4A2E" stroke-width="1" fill="none"/>
+  </g>
+  <g style="animation: leaf-unfurl 1.2s ease forwards 2.1s; opacity:0">
+    <path d="M268,370 C292,355 312,338 306,318 C290,332 276,352 268,370Z" fill="url(#leafG2)" opacity="0.85"/>
+    <path d="M268,370 C280,353 287,335 282,320" stroke="#1A4A2E" stroke-width="1" fill="none"/>
+  </g>
+  <!-- Center leaves -->
+  <g style="animation: leaf-unfurl 1.2s ease forwards 1.7s; opacity:0">
+    <path d="M200,420 C178,406 162,388 170,368 C186,382 196,402 200,420Z" fill="url(#leafG)" opacity="0.88"/>
+  </g>
+  <g style="animation: leaf-unfurl 1.2s ease forwards 2.2s; opacity:0">
+    <path d="M220,400 C242,386 258,368 250,348 C234,362 224,382 220,400Z" fill="url(#leafG2)" opacity="0.88"/>
+  </g>
+
+  <!-- ===== WRAPPING PAPER ===== -->
+  <!-- Kraft/tissue paper wrapping -->
+  <g filter="url(#soft-shadow)" opacity="0.92">
+    <!-- Main wrap cone -->
+    <path d="M120,600 C125,560 140,530 155,510 C165,496 175,488 200,485 C225,482 248,490 265,505 C280,518 292,548 298,600Z" fill="url(#wrapG)"/>
+    <!-- Wrap fold left -->
+    <path d="M120,600 C125,560 140,530 155,510 C148,505 138,510 130,530 C122,550 118,580 120,600Z" fill="#F0E4CC" opacity="0.7"/>
+    <!-- Wrap fold right -->
+    <path d="M298,600 C292,548 280,518 265,505 C272,500 282,506 290,525 C298,545 300,575 298,600Z" fill="#F0E4CC" opacity="0.7"/>
+    <!-- Wrap crease lines -->
+    <path d="M155,510 C165,530 172,558 175,590" stroke="#D4C4A8" stroke-width="1" fill="none" opacity="0.6"/>
+    <path d="M265,505 C255,528 248,558 245,590" stroke="#D4C4A8" stroke-width="1" fill="none" opacity="0.6"/>
+    <path d="M210,485 C210,520 210,560 210,600" stroke="#D4C4A8" stroke-width="1" fill="none" opacity="0.4"/>
+    <!-- Top edge decorative -->
+    <path d="M155,510 C170,498 190,490 210,488 C230,486 250,494 265,505" stroke="#C8B898" stroke-width="1.5" fill="none" opacity="0.8"/>
+  </g>
+
+  <!-- ===== RIBBON ===== -->
+  <!-- Ribbon body - horizontal band -->
+  <g filter="url(#glow)" style="animation: ribbon-wave 4s ease-in-out infinite">
+    <!-- Main ribbon band -->
+    <path d="M140,505 C165,498 190,494 210,493 C230,492 255,496 280,505 C280,518 255,514 230,510 C215,508 205,507 190,509 C168,512 148,518 140,518Z" fill="url(#ribbonG)"/>
+    <!-- Ribbon shimmer -->
+    <path d="M155,505 C175,499 200,496 225,498 C248,500 268,506 280,510" stroke="rgba(255,248,200,0.7)" stroke-width="1.5" fill="none"/>
+    <!-- Ribbon shadow bottom -->
+    <path d="M140,518 C165,515 192,512 210,512 C228,511 255,514 280,518" stroke="#A07818" stroke-width="1" fill="none" opacity="0.6"/>
+
+    <!-- Bow left loop -->
+    <path d="M165,506 C155,488 138,472 118,468 C108,466 100,470 103,480 C106,490 120,494 135,495 C150,496 162,500 165,506Z" fill="url(#ribbonGV)"/>
+    <path d="M165,506 C152,490 132,476 115,472" stroke="rgba(255,240,150,0.5)" stroke-width="1" fill="none"/>
+    <!-- Bow right loop -->
+    <path d="M255,506 C265,488 282,472 302,468 C312,466 320,470 317,480 C314,490 300,494 285,495 C270,496 258,500 255,506Z" fill="url(#ribbonGV)"/>
+    <path d="M255,506 C268,490 288,476 305,472" stroke="rgba(255,240,150,0.5)" stroke-width="1" fill="none"/>
+
+    <!-- Bow center knot -->
+    <ellipse cx="210" cy="505" rx="20" ry="14" fill="url(#ribbonG)"/>
+    <ellipse cx="210" cy="505" rx="12" ry="8" fill="#E8C030" opacity="0.8"/>
+    <ellipse cx="207" cy="503" rx="6" ry="4" fill="rgba(255,248,180,0.6)"/>
+
+    <!-- Bow tails hanging down -->
+    <path d="M200,512 C192,530 185,550 188,575 C190,585 196,590 200,600" stroke="url(#ribbonG)" stroke-width="7" fill="none" stroke-linecap="round"/>
+    <path d="M220,512 C228,530 235,550 232,575 C230,585 224,590 220,600" stroke="url(#ribbonG)" stroke-width="7" fill="none" stroke-linecap="round"/>
+    <!-- Tail ends -->
+    <path d="M185,590 C182,600 192,605 200,600" stroke="#C8A020" stroke-width="2" fill="none"/>
+    <path d="M235,590 C238,600 228,605 220,600" stroke="#C8A020" stroke-width="2" fill="none"/>
+  </g>
+
+  <!-- ===== FLOWERS ===== -->
+
+  <!-- === HELPER FUNCTION — each rose is drawn as a group of concentric petals === -->
+
+  <!-- ROSE 1 — Center, large, facing front -->
+  <g class="rose-group" transform="translate(210, 200)" filter="url(#soft-shadow)" style="animation: sway 5.5s ease-in-out infinite; animation-delay: 0s;">
+    <!-- Outer petals layer -->
+    <ellipse cx="0" cy="8" rx="32" ry="24" fill="#8B1A2F" opacity="0.8" transform="rotate(-30)"/>
+    <ellipse cx="0" cy="8" rx="32" ry="24" fill="#8B1A2F" opacity="0.8" transform="rotate(30)"/>
+    <ellipse cx="0" cy="8" rx="32" ry="24" fill="#8B1A2F" opacity="0.8" transform="rotate(90)"/>
+    <ellipse cx="0" cy="8" rx="32" ry="24" fill="#8B1A2F" opacity="0.8" transform="rotate(150)"/>
+    <ellipse cx="0" cy="8" rx="32" ry="24" fill="#8B1A2F" opacity="0.8" transform="rotate(210)"/>
+    <ellipse cx="0" cy="8" rx="32" ry="24" fill="#8B1A2F" opacity="0.8" transform="rotate(270)"/>
+    <!-- Mid petals -->
+    <ellipse cx="0" cy="6" rx="25" ry="19" fill="url(#rg1)" transform="rotate(-20)"/>
+    <ellipse cx="0" cy="6" rx="25" ry="19" fill="url(#rg1)" transform="rotate(40)"/>
+    <ellipse cx="0" cy="6" rx="25" ry="19" fill="url(#rg1)" transform="rotate(100)"/>
+    <ellipse cx="0" cy="6" rx="25" ry="19" fill="url(#rg1)" transform="rotate(160)"/>
+    <ellipse cx="0" cy="6" rx="25" ry="19" fill="url(#rg1)" transform="rotate(220)"/>
+    <ellipse cx="0" cy="6" rx="25" ry="19" fill="url(#rg1)" transform="rotate(280)"/>
+    <!-- Inner petals -->
+    <ellipse cx="0" cy="5" rx="18" ry="13" fill="url(#rg2)" transform="rotate(-15)"/>
+    <ellipse cx="0" cy="5" rx="18" ry="13" fill="url(#rg2)" transform="rotate(45)"/>
+    <ellipse cx="0" cy="5" rx="18" ry="13" fill="url(#rg2)" transform="rotate(105)"/>
+    <ellipse cx="0" cy="5" rx="18" ry="13" fill="url(#rg2)" transform="rotate(165)"/>
+    <ellipse cx="0" cy="5" rx="18" ry="13" fill="url(#rg2)" transform="rotate(225)"/>
+    <!-- Core spiral -->
+    <ellipse cx="0" cy="3" rx="11" ry="8" fill="url(#rg3)" transform="rotate(10)"/>
+    <ellipse cx="0" cy="3" rx="11" ry="8" fill="url(#rg3)" transform="rotate(70)"/>
+    <ellipse cx="0" cy="3" rx="11" ry="8" fill="url(#rg3)" transform="rotate(130)"/>
+    <ellipse cx="0" cy="3" rx="11" ry="8" fill="url(#rg3)" transform="rotate(190)"/>
+    <!-- Center bud -->
+    <ellipse cx="0" cy="0" rx="7" ry="5" fill="#FDD5DE"/>
+    <ellipse cx="0" cy="-1" rx="4" ry="3" fill="#FFF0F5"/>
+    <!-- Highlight -->
+    <ellipse cx="-4" cy="-6" rx="5" ry="3" fill="rgba(255,255,255,0.25)" transform="rotate(-20)"/>
+  </g>
+
+  <!-- ROSE 2 — Left, slightly lower, angled -->
+  <g class="rose-group" transform="translate(148,240)" filter="url(#soft-shadow)" style="animation: sway-alt 6s ease-in-out infinite; animation-delay: -1s;">
+    <ellipse cx="0" cy="7" rx="28" ry="20" fill="#7A1228" opacity="0.85" transform="rotate(-25)"/>
+    <ellipse cx="0" cy="7" rx="28" ry="20" fill="#7A1228" opacity="0.85" transform="rotate(35)"/>
+    <ellipse cx="0" cy="7" rx="28" ry="20" fill="#7A1228" opacity="0.85" transform="rotate(95)"/>
+    <ellipse cx="0" cy="7" rx="28" ry="20" fill="#7A1228" opacity="0.85" transform="rotate(155)"/>
+    <ellipse cx="0" cy="7" rx="28" ry="20" fill="#7A1228" opacity="0.85" transform="rotate(215)"/>
+    <ellipse cx="0" cy="7" rx="28" ry="20" fill="#7A1228" opacity="0.85" transform="rotate(275)"/>
+    <ellipse cx="0" cy="5" rx="21" ry="15" fill="url(#rg4)" transform="rotate(-15)"/>
+    <ellipse cx="0" cy="5" rx="21" ry="15" fill="url(#rg4)" transform="rotate(45)"/>
+    <ellipse cx="0" cy="5" rx="21" ry="15" fill="url(#rg4)" transform="rotate(105)"/>
+    <ellipse cx="0" cy="5" rx="21" ry="15" fill="url(#rg4)" transform="rotate(165)"/>
+    <ellipse cx="0" cy="5" rx="21" ry="15" fill="url(#rg4)" transform="rotate(225)"/>
+    <ellipse cx="0" cy="3" rx="13" ry="9" fill="url(#rg1)" transform="rotate(20)"/>
+    <ellipse cx="0" cy="3" rx="13" ry="9" fill="url(#rg1)" transform="rotate(80)"/>
+    <ellipse cx="0" cy="3" rx="13" ry="9" fill="url(#rg1)" transform="rotate(140)"/>
+    <ellipse cx="0" cy="3" rx="13" ry="9" fill="url(#rg1)" transform="rotate(200)"/>
+    <ellipse cx="0" cy="0" rx="7" ry="5" fill="#E8698A"/>
+    <ellipse cx="-3" cy="-4" rx="4" ry="3" fill="rgba(255,255,255,0.2)" transform="rotate(-15)"/>
+  </g>
+
+  <!-- ROSE 3 — Right, mid height -->
+  <g class="rose-group" transform="translate(272,230)" filter="url(#soft-shadow)" style="animation: sway 6.5s ease-in-out infinite; animation-delay: -2.5s;">
+    <ellipse cx="0" cy="7" rx="28" ry="21" fill="#6A1020" opacity="0.85" transform="rotate(-20)"/>
+    <ellipse cx="0" cy="7" rx="28" ry="21" fill="#6A1020" opacity="0.85" transform="rotate(40)"/>
+    <ellipse cx="0" cy="7" rx="28" ry="21" fill="#6A1020" opacity="0.85" transform="rotate(100)"/>
+    <ellipse cx="0" cy="7" rx="28" ry="21" fill="#6A1020" opacity="0.85" transform="rotate(160)"/>
+    <ellipse cx="0" cy="7" rx="28" ry="21" fill="#6A1020" opacity="0.85" transform="rotate(220)"/>
+    <ellipse cx="0" cy="7" rx="28" ry="21" fill="#6A1020" opacity="0.85" transform="rotate(280)"/>
+    <ellipse cx="0" cy="5" rx="22" ry="16" fill="url(#rg2)" transform="rotate(-10)"/>
+    <ellipse cx="0" cy="5" rx="22" ry="16" fill="url(#rg2)" transform="rotate(50)"/>
+    <ellipse cx="0" cy="5" rx="22" ry="16" fill="url(#rg2)" transform="rotate(110)"/>
+    <ellipse cx="0" cy="5" rx="22" ry="16" fill="url(#rg2)" transform="rotate(170)"/>
+    <ellipse cx="0" cy="5" rx="22" ry="16" fill="url(#rg2)" transform="rotate(230)"/>
+    <ellipse cx="0" cy="3" rx="14" ry="10" fill="url(#rg3)" transform="rotate(15)"/>
+    <ellipse cx="0" cy="3" rx="14" ry="10" fill="url(#rg3)" transform="rotate(75)"/>
+    <ellipse cx="0" cy="3" rx="14" ry="10" fill="url(#rg3)" transform="rotate(135)"/>
+    <ellipse cx="0" cy="3" rx="14" ry="10" fill="url(#rg3)" transform="rotate(195)"/>
+    <ellipse cx="0" cy="0" rx="8" ry="6" fill="#FFB8C8"/>
+    <ellipse cx="-3" cy="-5" rx="5" ry="3" fill="rgba(255,255,255,0.22)" transform="rotate(-10)"/>
+  </g>
+
+  <!-- ROSE 4 — Far left, higher, bud-like -->
+  <g class="rose-group" transform="translate(108,278)" filter="url(#soft-shadow)" style="animation: sway-alt 7s ease-in-out infinite; animation-delay: -3s;">
+    <ellipse cx="0" cy="6" rx="22" ry="16" fill="#8B1A2F" opacity="0.9" transform="rotate(-15)"/>
+    <ellipse cx="0" cy="6" rx="22" ry="16" fill="#8B1A2F" opacity="0.9" transform="rotate(45)"/>
+    <ellipse cx="0" cy="6" rx="22" ry="16" fill="#8B1A2F" opacity="0.9" transform="rotate(105)"/>
+    <ellipse cx="0" cy="6" rx="22" ry="16" fill="#8B1A2F" opacity="0.9" transform="rotate(165)"/>
+    <ellipse cx="0" cy="6" rx="22" ry="16" fill="#8B1A2F" opacity="0.9" transform="rotate(225)"/>
+    <ellipse cx="0" cy="4" rx="15" ry="11" fill="url(#rg4)" transform="rotate(10)"/>
+    <ellipse cx="0" cy="4" rx="15" ry="11" fill="url(#rg4)" transform="rotate(70)"/>
+    <ellipse cx="0" cy="4" rx="15" ry="11" fill="url(#rg4)" transform="rotate(130)"/>
+    <ellipse cx="0" cy="4" rx="15" ry="11" fill="url(#rg4)" transform="rotate(190)"/>
+    <ellipse cx="0" cy="2" rx="9" ry="6" fill="url(#rg1)" transform="rotate(30)"/>
+    <ellipse cx="0" cy="2" rx="9" ry="6" fill="url(#rg1)" transform="rotate(90)"/>
+    <ellipse cx="0" cy="2" rx="9" ry="6" fill="url(#rg1)" transform="rotate(150)"/>
+    <ellipse cx="0" cy="0" rx="5" ry="4" fill="#FDD5DE"/>
+  </g>
+
+  <!-- ROSE 5 — Far right, higher -->
+  <g class="rose-group" transform="translate(325,270)" filter="url(#soft-shadow)" style="animation: sway 5s ease-in-out infinite; animation-delay: -1.5s;">
+    <ellipse cx="0" cy="6" rx="23" ry="17" fill="#6A1428" opacity="0.88" transform="rotate(-20)"/>
+    <ellipse cx="0" cy="6" rx="23" ry="17" fill="#6A1428" opacity="0.88" transform="rotate(40)"/>
+    <ellipse cx="0" cy="6" rx="23" ry="17" fill="#6A1428" opacity="0.88" transform="rotate(100)"/>
+    <ellipse cx="0" cy="6" rx="23" ry="17" fill="#6A1428" opacity="0.88" transform="rotate(160)"/>
+    <ellipse cx="0" cy="6" rx="23" ry="17" fill="#6A1428" opacity="0.88" transform="rotate(220)"/>
+    <ellipse cx="0" cy="4" rx="16" ry="12" fill="url(#rg2)" transform="rotate(-5)"/>
+    <ellipse cx="0" cy="4" rx="16" ry="12" fill="url(#rg2)" transform="rotate(55)"/>
+    <ellipse cx="0" cy="4" rx="16" ry="12" fill="url(#rg2)" transform="rotate(115)"/>
+    <ellipse cx="0" cy="4" rx="16" ry="12" fill="url(#rg2)" transform="rotate(175)"/>
+    <ellipse cx="0" cy="4" rx="16" ry="12" fill="url(#rg2)" transform="rotate(235)"/>
+    <ellipse cx="0" cy="2" rx="10" ry="7" fill="url(#rg3)" transform="rotate(25)"/>
+    <ellipse cx="0" cy="2" rx="10" ry="7" fill="url(#rg3)" transform="rotate(85)"/>
+    <ellipse cx="0" cy="2" rx="10" ry="7" fill="url(#rg3)" transform="rotate(145)"/>
+    <ellipse cx="0" cy="0" rx="6" ry="4" fill="#FFB8C8"/>
+  </g>
+
+  <!-- PEONY — Upper center-left, soft pink -->
+  <g class="rose-group" transform="translate(178,168)" filter="url(#soft-shadow)" style="animation: sway-alt 8s ease-in-out infinite; animation-delay: -0.5s;">
+    <!-- Many ruffled petals -->
+    <ellipse cx="0" cy="10" rx="26" ry="20" fill="#C06080" opacity="0.7" transform="rotate(-30)"/>
+    <ellipse cx="0" cy="10" rx="26" ry="20" fill="#C06080" opacity="0.7" transform="rotate(10)"/>
+    <ellipse cx="0" cy="10" rx="26" ry="20" fill="#C06080" opacity="0.7" transform="rotate(50)"/>
+    <ellipse cx="0" cy="10" rx="26" ry="20" fill="#C06080" opacity="0.7" transform="rotate(90)"/>
+    <ellipse cx="0" cy="10" rx="26" ry="20" fill="#C06080" opacity="0.7" transform="rotate(130)"/>
+    <ellipse cx="0" cy="10" rx="26" ry="20" fill="#C06080" opacity="0.7" transform="rotate(170)"/>
+    <ellipse cx="0" cy="10" rx="26" ry="20" fill="#C06080" opacity="0.7" transform="rotate(210)"/>
+    <ellipse cx="0" cy="10" rx="26" ry="20" fill="#C06080" opacity="0.7" transform="rotate(250)"/>
+    <ellipse cx="0" cy="10" rx="26" ry="20" fill="#C06080" opacity="0.7" transform="rotate(290)"/>
+    <ellipse cx="0" cy="8" rx="20" ry="15" fill="url(#pg1)" transform="rotate(-20)"/>
+    <ellipse cx="0" cy="8" rx="20" ry="15" fill="url(#pg1)" transform="rotate(20)"/>
+    <ellipse cx="0" cy="8" rx="20" ry="15" fill="url(#pg1)" transform="rotate(60)"/>
+    <ellipse cx="0" cy="8" rx="20" ry="15" fill="url(#pg1)" transform="rotate(100)"/>
+    <ellipse cx="0" cy="8" rx="20" ry="15" fill="url(#pg1)" transform="rotate(140)"/>
+    <ellipse cx="0" cy="8" rx="20" ry="15" fill="url(#pg1)" transform="rotate(180)"/>
+    <ellipse cx="0" cy="8" rx="20" ry="15" fill="url(#pg1)" transform="rotate(220)"/>
+    <ellipse cx="0" cy="8" rx="20" ry="15" fill="url(#pg1)" transform="rotate(260)"/>
+    <ellipse cx="0" cy="8" rx="20" ry="15" fill="url(#pg1)" transform="rotate(300)"/>
+    <ellipse cx="0" cy="5" rx="13" ry="10" fill="#FDE8F0" transform="rotate(10)"/>
+    <ellipse cx="0" cy="5" rx="13" ry="10" fill="#FDE8F0" transform="rotate(50)"/>
+    <ellipse cx="0" cy="5" rx="13" ry="10" fill="#FDE8F0" transform="rotate(90)"/>
+    <ellipse cx="0" cy="5" rx="13" ry="10" fill="#FDE8F0" transform="rotate(130)"/>
+    <ellipse cx="0" cy="5" rx="13" ry="10" fill="#FDE8F0" transform="rotate(170)"/>
+    <ellipse cx="0" cy="5" rx="13" ry="10" fill="#FDE8F0" transform="rotate(210)"/>
+    <ellipse cx="0" cy="5" rx="13" ry="10" fill="#FDE8F0" transform="rotate(250)"/>
+    <ellipse cx="0" cy="5" rx="13" ry="10" fill="#FDE8F0" transform="rotate(290)"/>
+    <circle cx="0" cy="0" r="9" fill="#FFF0F5"/>
+    <circle cx="0" cy="0" r="6" fill="#FFE0EC"/>
+    <circle cx="-2" cy="-3" r="3" fill="rgba(255,255,255,0.5)"/>
+  </g>
+
+  <!-- LAVENDER FLOWER — Upper right -->
+  <g class="rose-group" transform="translate(245, 178)" filter="url(#soft-shadow)" style="animation: sway 9s ease-in-out infinite; animation-delay: -4s;">
+    <ellipse cx="0" cy="9" rx="22" ry="17" fill="#8A6A9E" opacity="0.75" transform="rotate(-25)"/>
+    <ellipse cx="0" cy="9" rx="22" ry="17" fill="#8A6A9E" opacity="0.75" transform="rotate(35)"/>
+    <ellipse cx="0" cy="9" rx="22" ry="17" fill="#8A6A9E" opacity="0.75" transform="rotate(95)"/>
+    <ellipse cx="0" cy="9" rx="22" ry="17" fill="#8A6A9E" opacity="0.75" transform="rotate(155)"/>
+    <ellipse cx="0" cy="9" rx="22" ry="17" fill="#8A6A9E" opacity="0.75" transform="rotate(215)"/>
+    <ellipse cx="0" cy="9" rx="22" ry="17" fill="#8A6A9E" opacity="0.75" transform="rotate(275)"/>
+    <ellipse cx="0" cy="7" rx="16" ry="12" fill="url(#lg1)" transform="rotate(-15)"/>
+    <ellipse cx="0" cy="7" rx="16" ry="12" fill="url(#lg1)" transform="rotate(45)"/>
+    <ellipse cx="0" cy="7" rx="16" ry="12" fill="url(#lg1)" transform="rotate(105)"/>
+    <ellipse cx="0" cy="7" rx="16" ry="12" fill="url(#lg1)" transform="rotate(165)"/>
+    <ellipse cx="0" cy="7" rx="16" ry="12" fill="url(#lg1)" transform="rotate(225)"/>
+    <ellipse cx="0" cy="7" rx="16" ry="12" fill="url(#lg1)" transform="rotate(285)"/>
+    <ellipse cx="0" cy="4" rx="9" ry="7" fill="#E8D8F4" transform="rotate(20)"/>
+    <ellipse cx="0" cy="4" rx="9" ry="7" fill="#E8D8F4" transform="rotate(80)"/>
+    <ellipse cx="0" cy="4" rx="9" ry="7" fill="#E8D8F4" transform="rotate(140)"/>
+    <ellipse cx="0" cy="4" rx="9" ry="7" fill="#E8D8F4" transform="rotate(200)"/>
+    <circle cx="0" cy="0" r="7" fill="#B8A0D0"/>
+    <circle cx="0" cy="0" r="4" fill="#D4C0E8"/>
+    <circle cx="-1" cy="-2" r="2" fill="rgba(255,255,255,0.4)"/>
+    <!-- Stamens -->
+    <circle cx="0" cy="-1" r="1.5" fill="#F0E050"/>
+    <circle cx="3" cy="2" r="1.2" fill="#E8D840"/>
+    <circle cx="-3" cy="2" r="1.2" fill="#E8D840"/>
+  </g>
+
+  <!-- ROSE BUD — Very top, small, barely open -->
+  <g class="rose-group" transform="translate(210, 148)" filter="url(#soft-shadow)" style="animation: sway-alt 5s ease-in-out infinite; animation-delay: -0.8s;">
+    <!-- Sepals -->
+    <ellipse cx="0" cy="10" rx="8" ry="18" fill="#2D6A4F" opacity="0.9" transform="rotate(-20)"/>
+    <ellipse cx="0" cy="10" rx="8" ry="18" fill="#2D6A4F" opacity="0.9" transform="rotate(20)"/>
+    <ellipse cx="0" cy="10" rx="8" ry="18" fill="#2D6A4F" opacity="0.9" transform="rotate(60)"/>
+    <!-- Bud petals -->
+    <ellipse cx="0" cy="4" rx="12" ry="16" fill="#9E2345"/>
+    <ellipse cx="0" cy="4" rx="9" ry="13" fill="#C0395A"/>
+    <ellipse cx="0" cy="3" rx="6" ry="9" fill="#E8698A"/>
+    <ellipse cx="0" cy="2" rx="4" ry="6" fill="#FDD5DE"/>
+    <ellipse cx="0" cy="1" rx="2.5" ry="4" fill="#FFF0F5"/>
+  </g>
+
+  <!-- Small accent flowers / baby's breath style -->
+  <!-- Left cluster -->
+  <g style="animation: sway 8s ease-in-out infinite; animation-delay: -3s;">
+    <circle cx="90" cy="248" r="8" fill="#FDE8F0" opacity="0.9"/>
+    <circle cx="90" cy="248" r="5" fill="#F8C8D8"/>
+    <circle cx="90" cy="248" r="2.5" fill="#F0A0C0"/>
+    <circle cx="78" cy="262" r="6" fill="#FDE8F0" opacity="0.85"/>
+    <circle cx="78" cy="262" r="3.5" fill="#F8C8D8"/>
+    <circle cx="100" cy="260" r="7" fill="#E8D8F4" opacity="0.85"/>
+    <circle cx="100" cy="260" r="4" fill="#D4B8E8"/>
+  </g>
+  <!-- Right cluster -->
+  <g style="animation: sway-alt 7s ease-in-out infinite; animation-delay: -1.8s;">
+    <circle cx="338" cy="242" r="8" fill="#FDE8F0" opacity="0.9"/>
+    <circle cx="338" cy="242" r="5" fill="#F8C8D8"/>
+    <circle cx="338" cy="242" r="2.5" fill="#F0A0C0"/>
+    <circle cx="350" cy="256" r="6" fill="#FDE8F0" opacity="0.85"/>
+    <circle cx="350" cy="256" r="3.5" fill="#F8C8D8"/>
+    <circle cx="328" cy="258" r="7" fill="#E8D8F4" opacity="0.85"/>
+    <circle cx="328" cy="258" r="4" fill="#D4B8E8"/>
+  </g>
+
+</svg>
 </div>
 
-<div class="flower sunflower f2">
-<div class="center"></div>
-<div class="petal" style="top:0;left:25px;transform:rotate(0deg)"></div>
-<div class="petal" style="top:5px;left:40px;transform:rotate(45deg)"></div>
-<div class="petal" style="top:20px;left:45px;transform:rotate(90deg)"></div>
-<div class="petal" style="top:35px;left:40px;transform:rotate(135deg)"></div>
-<div class="petal" style="top:40px;left:25px;transform:rotate(180deg)"></div>
-<div class="petal" style="top:35px;left:10px;transform:rotate(225deg)"></div>
-<div class="petal" style="top:20px;left:5px;transform:rotate(270deg)"></div>
-<div class="petal" style="top:5px;left:10px;transform:rotate(315deg)"></div>
-</div>
+<script>
+// Generate ambient floating particles
+const particlesEl = document.getElementById('particles');
+for (let i = 0; i < 28; i++) {
+  const p = document.createElement('div');
+  p.className = 'particle';
+  const size = 3 + Math.random() * 6;
+  p.style.cssText = `
+    width: ${size}px;
+    height: ${size}px;
+    left: ${20 + Math.random() * 60}%;
+    animation-duration: ${8 + Math.random() * 14}s;
+    animation-delay: ${Math.random() * 12}s;
+  `;
+  particlesEl.appendChild(p);
+}
 
-<div class="flower carnation f3">
-<div class="petal" style="top:5px;left:10px"></div>
-<div class="petal" style="top:0px;left:20px"></div>
-<div class="petal" style="top:10px;left:30px"></div>
-<div class="petal" style="top:15px;left:5px"></div>
-</div>
-
-<div class="flower rose f4">
-<div class="petal" style="top:10px;left:20px"></div>
-<div class="petal" style="top:0px;left:10px"></div>
-<div class="petal" style="top:0px;left:30px"></div>
-<div class="petal" style="top:15px;left:5px"></div>
-<div class="petal" style="top:15px;left:35px"></div>
-</div>
-
-<div class="flower sunflower f5">
-<div class="center"></div>
-<div class="petal" style="top:0;left:25px;transform:rotate(0deg)"></div>
-<div class="petal" style="top:5px;left:40px;transform:rotate(45deg)"></div>
-<div class="petal" style="top:20px;left:45px;transform:rotate(90deg)"></div>
-<div class="petal" style="top:35px;left:40px;transform:rotate(135deg)"></div>
-<div class="petal" style="top:40px;left:25px;transform:rotate(180deg)"></div>
-<div class="petal" style="top:35px;left:10px;transform:rotate(225deg)"></div>
-<div class="petal" style="top:20px;left:5px;transform:rotate(270deg)"></div>
-<div class="petal" style="top:5px;left:10px;transform:rotate(315deg)"></div>
-</div>
-
-<!-- TALLOS -->
-
-<div class="stem" style="left:150px;height:300px;transform:rotate(-10deg)"></div>
-<div class="stem" style="left:220px;height:320px;transform:rotate(5deg)"></div>
-<div class="stem" style="left:100px;height:280px;transform:rotate(-15deg)"></div>
-<div class="stem" style="left:260px;height:270px;transform:rotate(15deg)"></div>
-<div class="stem" style="left:190px;height:350px"></div>
-
-<!-- HOJAS -->
-
-<div class="leaf" style="left:150px;bottom:260px;transform:rotate(-20deg)"></div>
-<div class="leaf" style="left:210px;bottom:230px;transform:rotate(25deg)"></div>
-<div class="leaf" style="left:120px;bottom:220px;transform:rotate(-40deg)"></div>
-
-<!-- ENVOLTURA -->
-
-<div class="wrap"></div>
-
-<!-- LISTÓN -->
-
-<div class="ribbon">
-<div class="loopL"></div>
-<div class="loopR"></div>
-<div class="knot"></div>
-<div class="tailL"></div>
-<div class="tailR"></div>
-</div>
-
-</div>
-
+// Generate falling petals after bouquet appears
+setTimeout(() => {
+  for (let i = 0; i < 18; i++) {
+    const petal = document.createElement('div');
+    petal.className = 'falling-petal';
+    const colors = ['#FDD5DE','#F4A7B9','#E8698A','#E8D8F4','#C9A8D4'];
+    const color = colors[Math.floor(Math.random() * colors.length)];
+    const startX = 120 + Math.random() * 180;
+    const startY = 180 + Math.random() * 160;
+    const dx = (Math.random() - 0.5) * 120;
+    const rot = (Math.random() - 0.5) * 360;
+    const dur = 3 + Math.random() * 4;
+    const size = 8 + Math.random() * 12;
+    petal.style.cssText = `
+      left: calc(50% - 210px + ${startX}px);
+      top: ${startY}px;
+      width: ${size}px;
+      height: ${size * 0.65}px;
+      border-radius: 60% 0 60% 0;
+      background: ${color};
+      opacity: 0;
+      --dx: ${dx}px;
+      --rot: ${rot}deg;
+      --dur: ${dur}s;
+      --delay: ${1 + Math.random() * 8}s;
+    `;
+    document.body.appendChild(petal);
+  }
+}, 2500);
+</script>
 </body>
 </html>
-
